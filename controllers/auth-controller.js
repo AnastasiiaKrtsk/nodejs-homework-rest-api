@@ -4,9 +4,11 @@ import { ctrlWrapper } from "../decorators/index.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import "dotenv/config.js";
+import { userSignupSchema } from "../models/User.js";
 const { JWT_SECRET } = process.env;
 
 const signup = async (req, res, next) => {
+  await userSignupSchema.validateAsync(req.body);
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (user) {
@@ -19,6 +21,7 @@ const signup = async (req, res, next) => {
   res.status(201).json({
     username: newUser.username,
     email: newUser.email,
+    avatarURL: newUser.avatarURL,
   });
 };
 
@@ -40,7 +43,7 @@ const signin = async (req, res) => {
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
   await User.findByIdAndUpdate(id, { token });
-  res.json({ token });
+  res.json({ token, user });
 };
 
 const getCurrent = async (req, res) => {
