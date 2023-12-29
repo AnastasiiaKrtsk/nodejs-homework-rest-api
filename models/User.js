@@ -33,6 +33,13 @@ const userSchema = new Schema(
     token: {
       type: String,
     },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -57,6 +64,10 @@ userSchema.pre("save", async function (next) {
     });
   }
   next();
+});
+
+export const userEmailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required(),
 });
 
 const User = model("user", userSchema);
